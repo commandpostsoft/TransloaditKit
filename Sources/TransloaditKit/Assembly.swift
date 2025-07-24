@@ -54,7 +54,7 @@ extension Assembly: CustomStringConvertible {
         "\(id),\(error ?? ""),\(tusURL.absoluteString),\(url.absoluteString)"
     }
     
-    init?(fromString: String) {
+    public init?(fromString: String) {
         let values = fromString.components(separatedBy: ",")
         guard values.count == 4 else { return nil }
         

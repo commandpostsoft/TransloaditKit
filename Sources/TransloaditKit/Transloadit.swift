@@ -63,7 +63,7 @@ public final class Transloadit {
     
     // "private" -- only exposed for unit testing
     let tusSessionConfig: URLSessionConfiguration
-    lazy var tusClient: TUSClient = {
+    public lazy var tusClient: TUSClient = {
         let tusClient = try! TUSClient(server: URL(string:"https://www.transloadit.com")!, sessionIdentifier: "TransloadIt", sessionConfiguration: tusSessionConfig, storageDirectory: storageDir)
         tusClient.delegate = self
         return tusClient
