@@ -337,6 +337,28 @@ public final class Transloadit {
     
     @available(macOS 10.15, iOS 13, *)
     public func createAssembly(
+      templateId: String,
+      expectedNumberOfFiles: Int = 1,
+      customFields: [String: String] = [:]
+    ) async throws -> Assembly {
+        return try await withCheckedThrowingContinuation { continuation in
+            createAssembly(
+              templateId: templateId,
+              expectedNumberOfFiles: expectedNumberOfFiles,
+              customFields: customFields,
+              completion: { result in
+                switch result {
+                case .success(let assembly):
+                    continuation.resume(returning: assembly)
+                case .failure(let transloaditError):
+                    continuation.resume(throwing: transloaditError)
+                }
+            })
+        }
+    }
+    
+    @available(macOS 10.15, iOS 13, *)
+    public func createAssembly(
       steps: [Step],
       andUpload files: [URL],
       customFields: [String: String] = [:]
@@ -358,6 +380,59 @@ public final class Transloadit {
                 }
             }
         })
+    }
+    
+    @available(macOS 10.15, iOS 13, *)
+    public func createAssembly(
+      templateId: String,
+      andUpload files: [URL],
+      customFields: [String: String] = [:]
+    ) async throws -> (Assembly, TransloaditPoller) {
+        
+        return try await withCheckedThrowingContinuation({ continuation in
+            var poller: TransloaditPoller!
+            poller = createAssembly(
+                templateId: templateId,
+                andUpload: files,
+                customFields: customFields
+            ) { result in
+
+                switch result {
+                case .success(let assembly):
+                    continuation.resume(returning: (assembly, poller))
+                case .failure(let transloaditError):
+                    continuation.resume(throwing: transloaditError)
+                }
+            }
+        })
+    }
+    
+    @available(macOS 10.15, iOS 13, *)
+    public func fetchStatus(assemblyURL: URL) async throws -> AssemblyStatus {
+        return try await withCheckedThrowingContinuation { continuation in
+            fetchStatus(assemblyURL: assemblyURL) { result in
+                switch result {
+                case .success(let status):
+                    continuation.resume(returning: status)
+                case .failure(let transloaditError):
+                    continuation.resume(throwing: transloaditError)
+                }
+            }
+        }
+    }
+    
+    @available(macOS 10.15, iOS 13, *)
+    public func cancelAssembly(_ assembly: Assembly) async throws -> AssemblyStatus {
+        return try await withCheckedThrowingContinuation { continuation in
+            cancelAssembly(assembly) { result in
+                switch result {
+                case .success(let status):
+                    continuation.resume(returning: status)
+                case .failure(let transloaditError):
+                    continuation.resume(throwing: transloaditError)
+                }
+            }
+        }
     }
     
 #endif
